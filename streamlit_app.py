@@ -4,13 +4,13 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
-# Set page configuration
+# --- Page Configuration ---
 st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="wide")
 
-# Dark mode toggle
+# --- Dark Mode Toggle ---
 dark_mode = st.sidebar.checkbox("🌙 Dark Mode", value=False)
 
-# Define light and dark CSS themes
+# --- CSS Themes ---
 light_css = """
 <style>
 body, .main {
@@ -33,6 +33,43 @@ body, .main {
     margin-bottom: 2rem;
     font-weight: 500;
     line-height: 1.4;
+}
+.input-column {
+    padding: 1rem;
+}
+.slider-label, .radio-label {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+.slider-value {
+    margin-bottom: 1rem;
+    color: #2980b9;
+}
+.result-fail {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 2rem;
+}
+.result-success {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60;
+    text-align: center;
+    margin-top: 2rem;
+}
+.chart-title {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 2rem;
+    font-size: 1.3rem;
+}
+footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #95a5a6;
 }
 </style>
 """
@@ -60,65 +97,84 @@ body, .main {
     font-weight: 500;
     line-height: 1.4;
 }
+.input-column {
+    padding: 1rem;
+}
+.slider-label, .radio-label {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+.slider-value {
+    margin-bottom: 1rem;
+    color: #4ab3f4;
+}
+.result-fail {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ef5350;
+    text-align: center;
+    margin-top: 2rem;
+}
+.result-success {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #66bb6a;
+    text-align: center;
+    margin-top: 2rem;
+}
+.chart-title {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 2rem;
+    font-size: 1.3rem;
+}
+footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #90a4ae;
+}
 </style>
 """
 
-# Apply the selected CSS theme
+# --- Apply Theme ---
 st.markdown(dark_css if dark_mode else light_css, unsafe_allow_html=True)
 
-# Load model and features
-model = joblib.load("car_component_failure_balanced.pkl11111")
+# --- Load Model ---
+model = joblib.load("car_component_failure_balanced.pkl11111")  # <- update if needed
 feature_columns = joblib.load("feature_columns.pkl")
 
-# --- Sidebar credits ---
+# --- Sidebar ---
 st.sidebar.markdown("""
 ---
 ### Credits & Links
-
 - 👨‍💻 [Muhammad Areeb Rizwan](https://www.linkedin.com/in/areebrizwan)  
 - 🌐 [Portfolio](https://sites.google.com/view/m-areeb-rizwan/home)  
 - 💻 [GitHub](https://github.com/Areebrizz)  
 """, unsafe_allow_html=True)
 
-# --- Title and subtitle ---
+# --- Header ---
 st.markdown('<div class="header">🚗 Car Component Failure Predictor</div>', unsafe_allow_html=True)
 st.markdown('<div class="subheader">Enter component readings to assess risk of failure.</div>', unsafe_allow_html=True)
 
-# Continue with rest of your app...
+# --- Input Section ---
+col1, col2 = st.columns(2)
 
-
-with st.container():
+with col1:
     st.markdown('<div class="input-column">', unsafe_allow_html=True)
-    st.markdown('<div class="slider-label">Temperature (°C)</div>', unsafe_allow_html=True)
-    temperature = st.slider("", 40.0, 160.0, 112.0, key="temp")
-    st.markdown(f'<div class="slider-value">{temperature:.1f}</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="slider-label">Vibration (units)</div>', unsafe_allow_html=True)
-    vibration = st.slider("", 5.0, 100.0, 44.4, key="vib")
-    st.markdown(f'<div class="slider-value">{vibration:.2f}</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="slider-label">Pressure (PSI)</div>', unsafe_allow_html=True)
-    pressure = st.slider("", 10.0, 50.0, 25.0, key="pressure")
-    st.markdown(f'<div class="slider-value">{pressure:.1f}</div>', unsafe_allow_html=True)
+    temperature = st.slider("Temperature (°C)", 40.0, 160.0, 112.0)
+    vibration = st.slider("Vibration (units)", 5.0, 100.0, 44.4)
+    pressure = st.slider("Pressure (PSI)", 10.0, 50.0, 25.0)
     st.markdown('</div>', unsafe_allow_html=True)
 
-with st.container():
+with col2:
     st.markdown('<div class="input-column">', unsafe_allow_html=True)
-    st.markdown('<div class="slider-label">Load (kg)</div>', unsafe_allow_html=True)
-    load = st.slider("", 100.0, 1500.0, 800.0, key="load")
-    st.markdown(f'<div class="slider-value">{load:.1f}</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="slider-label">Age (months)</div>', unsafe_allow_html=True)
-    age = st.slider("", 1, 120, 60, key="age")
-    st.markdown(f'<div class="slider-value">{age}</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="radio-label">Operational Mode</div>', unsafe_allow_html=True)
-    op_mode = st.radio("", ["Normal", "High Load", "Low Load"], key="opmode")
+    load = st.slider("Load (kg)", 100.0, 1500.0, 800.0)
+    age = st.slider("Age (months)", 1, 120, 60)
+    op_mode = st.radio("Operational Mode", ["Normal", "High Load", "Low Load"])
     st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)  # close inputs-wrapper
-
-# Prepare input dataframe for model prediction
+# --- Prepare input for prediction ---
 op_mode_map = {"Normal": 0, "High Load": 1, "Low Load": 2}
 input_dict = {
     "Temperature": temperature,
@@ -130,7 +186,7 @@ input_dict = {
 }
 input_df = pd.DataFrame([input_dict], columns=feature_columns)
 
-# --- Prediction ---
+# --- Prediction Button ---
 if st.button("Predict Failure Risk 🚦"):
     prediction = model.predict(input_df)[0]
     pred_prob = model.predict_proba(input_df)[0][1]
@@ -146,7 +202,7 @@ if st.button("Predict Failure Risk 🚦"):
             unsafe_allow_html=True
         )
 
-    # --- Feature importance plot ---
+    # --- Feature Importance Chart ---
     st.markdown('<div class="chart-title">Feature Importance</div>', unsafe_allow_html=True)
     importance = model.feature_importances_
     sorted_idx = np.argsort(importance)
