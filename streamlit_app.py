@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 
 # Load model and feature names
-model = joblib.load("car_component_failure_balanced.pkl")
+model = joblib.load("car_component_failure_balanced.pkl11111")
 feature_columns = joblib.load("feature_columns.pkl")
 
 # App title and intro
