@@ -8,182 +8,272 @@ import matplotlib.pyplot as plt
 model = joblib.load("car_component_failure_balanced.pkl11111")
 feature_columns = joblib.load("feature_columns.pkl")
 
-st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="centered")
+st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="wide")
 
 # Dark mode toggle
 dark_mode = st.sidebar.checkbox("🌙 Dark Mode", value=False)
 
-# CSS for light and dark modes
+# CSS for light and dark modes with better typography and layout
 light_css = """
 <style>
-    .main {
+    body, .main {
         background-color: #f9fbfc;
         color: #2c3e50;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0 2rem;
     }
     .header {
-        font-size: 3rem;
-        font-weight: 700;
+        font-size: 2.8rem;
+        font-weight: 800;
         color: #2e86de;
         text-align: center;
-        margin-bottom: 0.1em;
-        font-family: 'Segoe UI Black', sans-serif;
+        margin-top: 1.5rem;
+        margin-bottom: 0.2rem;
+        letter-spacing: 1px;
     }
     .subheader {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         text-align: center;
         color: #34495e;
         margin-bottom: 2rem;
         font-weight: 500;
+        line-height: 1.4;
     }
-    .input-container {
+    .inputs-wrapper {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        max-width: 900px;
+        margin: 0 auto 3rem auto;
+    }
+    .input-column {
         background: white;
-        border-radius: 15px;
-        padding: 20px 25px;
-        box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
-        margin-bottom: 2rem;
+        border-radius: 16px;
+        padding: 25px 30px;
+        box-shadow: 0 8px 20px rgb(0 0 0 / 0.07);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-height: 520px;
+        overflow-y: auto;
     }
     .slider-label {
-        font-weight: 600;
+        font-weight: 700;
         color: #34495e;
-        margin-bottom: 0.3rem;
         font-size: 1.1rem;
+        margin-bottom: 6px;
+        user-select: none;
     }
     .slider-value {
         color: #7f8c8d;
         font-size: 0.9rem;
-        margin-top: -10px;
-        margin-bottom: 10px;
         font-family: monospace;
+        margin-top: -12px;
+        margin-bottom: 12px;
+        user-select: none;
     }
     .radio-label {
-        font-size: 1.1rem;
-        font-weight: 600;
+        font-size: 1.15rem;
+        font-weight: 700;
         color: #34495e;
-        margin-bottom: 0.5rem;
+        margin-top: 12px;
+        margin-bottom: 8px;
+        user-select: none;
     }
+    /* Streamlit default tweaks */
+    .stSlider > div > div {
+        padding-bottom: 8px !important;
+    }
+    .stRadio > div {
+        margin-bottom: 8px;
+    }
+    /* Prediction result boxes */
     .result-success {
         background-color: #d4efdf;
         color: #27ae60;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 18px;
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         text-align: center;
-        box-shadow: 0 4px 15px rgb(39 174 96 / 0.4);
+        box-shadow: 0 4px 16px rgb(39 174 96 / 0.3);
+        max-width: 460px;
+        margin: 1rem auto 2rem auto;
+        user-select: none;
     }
     .result-fail {
         background-color: #f9d6d5;
         color: #c0392b;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 18px;
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         text-align: center;
-        box-shadow: 0 4px 15px rgb(192 57 43 / 0.4);
+        box-shadow: 0 4px 16px rgb(192 57 43 / 0.3);
+        max-width: 460px;
+        margin: 1rem auto 2rem auto;
+        user-select: none;
     }
+    /* Feature importance chart title */
     .chart-title {
         font-weight: 700;
         font-size: 1.3rem;
         color: #2e86de;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
         text-align: center;
+        user-select: none;
     }
     footer {
         text-align: center;
         font-size: 0.9rem;
         color: #95a5a6;
         margin-top: 3rem;
-        padding-top: 10px;
+        padding-top: 12px;
         border-top: 1px solid #ecf0f1;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none;
+    }
+    /* Scrollbar for input columns */
+    .input-column::-webkit-scrollbar {
+        width: 7px;
+    }
+    .input-column::-webkit-scrollbar-thumb {
+        background-color: #b0bec5;
+        border-radius: 10px;
     }
 </style>
 """
 
 dark_css = """
 <style>
-    .main {
+    body, .main {
         background-color: #121212;
         color: #e0e0e0;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0 2rem;
     }
     .header {
-        font-size: 3rem;
-        font-weight: 700;
+        font-size: 2.8rem;
+        font-weight: 800;
         color: #4ab3f4;
         text-align: center;
-        margin-bottom: 0.1em;
-        font-family: 'Segoe UI Black', sans-serif;
+        margin-top: 1.5rem;
+        margin-bottom: 0.2rem;
+        letter-spacing: 1px;
     }
     .subheader {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         text-align: center;
         color: #b0bec5;
         margin-bottom: 2rem;
         font-weight: 500;
+        line-height: 1.4;
     }
-    .input-container {
+    .inputs-wrapper {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        max-width: 900px;
+        margin: 0 auto 3rem auto;
+    }
+    .input-column {
         background: #1e1e1e;
-        border-radius: 15px;
-        padding: 20px 25px;
+        border-radius: 16px;
+        padding: 25px 30px;
         box-shadow: 0 8px 20px rgb(0 0 0 / 0.9);
-        margin-bottom: 2rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-height: 520px;
+        overflow-y: auto;
     }
     .slider-label {
-        font-weight: 600;
+        font-weight: 700;
         color: #b0bec5;
-        margin-bottom: 0.3rem;
         font-size: 1.1rem;
+        margin-bottom: 6px;
+        user-select: none;
     }
     .slider-value {
         color: #90a4ae;
         font-size: 0.9rem;
-        margin-top: -10px;
-        margin-bottom: 10px;
         font-family: monospace;
+        margin-top: -12px;
+        margin-bottom: 12px;
+        user-select: none;
     }
     .radio-label {
-        font-size: 1.1rem;
-        font-weight: 600;
+        font-size: 1.15rem;
+        font-weight: 700;
         color: #b0bec5;
-        margin-bottom: 0.5rem;
+        margin-top: 12px;
+        margin-bottom: 8px;
+        user-select: none;
     }
+    /* Streamlit default tweaks */
+    .stSlider > div > div {
+        padding-bottom: 8px !important;
+    }
+    .stRadio > div {
+        margin-bottom: 8px;
+    }
+    /* Prediction result boxes */
     .result-success {
         background-color: #2e7d32;
         color: #a5d6a7;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 18px;
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         text-align: center;
-        box-shadow: 0 4px 15px rgb(165 214 167 / 0.7);
+        box-shadow: 0 4px 16px rgb(165 214 167 / 0.7);
+        max-width: 460px;
+        margin: 1rem auto 2rem auto;
+        user-select: none;
     }
     .result-fail {
         background-color: #c62828;
         color: #ef9a9a;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 18px;
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         text-align: center;
-        box-shadow: 0 4px 15px rgb(239 154 154 / 0.7);
+        box-shadow: 0 4px 16px rgb(239 154 154 / 0.7);
+        max-width: 460px;
+        margin: 1rem auto 2rem auto;
+        user-select: none;
     }
+    /* Feature importance chart title */
     .chart-title {
         font-weight: 700;
         font-size: 1.3rem;
         color: #4ab3f4;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
         text-align: center;
+        user-select: none;
     }
     footer {
         text-align: center;
         font-size: 0.9rem;
         color: #78909c;
         margin-top: 3rem;
-        padding-top: 10px;
+        padding-top: 12px;
         border-top: 1px solid #263238;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none;
+    }
+    /* Scrollbar for input columns */
+    .input-column::-webkit-scrollbar {
+        width: 7px;
+    }
+    .input-column::-webkit-scrollbar-thumb {
+        background-color: #546e7a;
+        border-radius: 10px;
     }
 </style>
 """
@@ -195,105 +285,72 @@ st.markdown(dark_css if dark_mode else light_css, unsafe_allow_html=True)
 st.markdown('<div class="header">🚗 Car Component Failure Predictor</div>', unsafe_allow_html=True)
 st.markdown('<div class="subheader">Enter component readings to assess risk of failure.</div>', unsafe_allow_html=True)
 
-# --- Input sliders container ---
+# --- Inputs layout ---
+st.markdown('<div class="inputs-wrapper">', unsafe_allow_html=True)
 with st.container():
-    st.markdown('<div class="input-container">', unsafe_allow_html=True)
+st.markdown('<div class="input-column">', unsafe_allow_html=True)
+st.markdown('<div class="slider-label">Temperature (°C)</div>', unsafe_allow_html=True)
+temperature = st.slider("", 40.0, 160.0, 112.0, key="temp")
+st.markdown(f'<div class="slider-value">{temperature:.1f}</div>', unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
+st.markdown('<div class="slider-label">Vibration (units)</div>', unsafe_allow_html=True)
+vibration = st.slider("", 5.0, 100.0, 44.4, key="vib")
+st.markdown(f'<div class="slider-value">{vibration:.2f}</div>', unsafe_allow_html=True)
 
-    with col1:
-        st.markdown('<div class="slider-label">Temperature (°C)</div>', unsafe_allow_html=True)
-        temperature = st.slider("", 40.0, 160.0, 90.0, key="temp")
-        st.markdown(f'<div class="slider-value">{temperature:.1f}</div>', unsafe_allow_html=True)
+st.markdown('<div class="slider-label">Pressure (PSI)</div>', unsafe_allow_html=True)
+pressure = st.slider("", 10.0, 50.0, 25.0, key="pressure")
+st.markdown(f'<div class="slider-value">{pressure:.1f}</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="slider-label">Vibration (units)</div>', unsafe_allow_html=True)
-        vibration = st.slider("", 5.0, 100.0, 50.0, key="vib")
-        st.markdown(f'<div class="slider-value">{vibration:.1f}</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="slider-label">Usage (hours)</div>', unsafe_allow_html=True)
-        usage = st.slider("", 50.0, 2200.0, 1000.0, key="usage")
-        st.markdown(f'<div class="slider-value">{usage:.1f}</div>', unsafe_allow_html=True)
+with st.container():
+st.markdown('<div class="input-column">', unsafe_allow_html=True)
+st.markdown('<div class="slider-label">Load (kg)</div>', unsafe_allow_html=True)
+load = st.slider("", 100.0, 1500.0, 800.0, key="load")
+st.markdown(f'<div class="slider-value">{load:.1f}</div>', unsafe_allow_html=True)
 
-    with col2:
-        st.markdown('<div class="slider-label">⚙️ Component Wear (%)</div>', unsafe_allow_html=True)
+st.markdown('<div class="slider-label">Age (months)</div>', unsafe_allow_html=True)
+age = st.slider("", 1, 120, 60, key="age")
+st.markdown(f'<div class="slider-value">{age}</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="slider-label">Engine Wear</div>', unsafe_allow_html=True)
-        component_engine = st.slider("", 0, 100, 5, key="engine_wear")
-        st.markdown(f'<div class="slider-value">{component_engine}%</div>', unsafe_allow_html=True)
+st.markdown('<div class="radio-label">Operational Mode</div>', unsafe_allow_html=True)
+op_mode = st.radio("", ["Normal", "High Load", "Low Load"], key="opmode")
 
-        st.markdown('<div class="slider-label">Transmission Wear</div>', unsafe_allow_html=True)
-        component_transmission = st.slider("", 0, 100, 5, key="trans_wear")
-        st.markdown(f'<div class="slider-value">{component_transmission}%</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+op_mode_mapping = {"Normal": 0, "High Load": 1, "Low Load": 2}
 
-        st.markdown('<div class="slider-label">Brake Pad Wear</div>', unsafe_allow_html=True)
-        component_brakepad = st.slider("", 0, 100, 5, key="brake_wear")
-        st.markdown(f'<div class="slider-value">{component_brakepad}%</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="slider-label">Suspension Wear</div>', unsafe_allow_html=True)
-        component_suspension = st.slider("", 0, 100, 5, key="susp_wear")
-        st.markdown(f'<div class="slider-value">{component_suspension}%</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="slider-label">Exhaust Wear</div>', unsafe_allow_html=True)
-        component_exhaust = st.slider("", 0, 100, 5, key="exhaust_wear")
-        st.markdown(f'<div class="slider-value">{component_exhaust}%</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="radio-label">Maintenance Due?</div>', unsafe_allow_html=True)
-        maintenance_due_yes = st.radio("", ["Yes", "No"], key="maint_due") == "Yes"
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Prepare input for prediction (convert % to 0-1)
-input_data = {
-    "Temperature": temperature,
-    "Vibration": vibration,
-    "Usage": usage,
-    "Component_Engine": component_engine / 100,
-    "Component_Transmission": component_transmission / 100,
-    "Component_Brake Pad": component_brakepad / 100,
-    "Component_Suspension": component_suspension / 100,
-    "Component_Exhaust": component_exhaust / 100,
-    "Maintenance_Due_Yes": 1 if maintenance_due_yes else 0,
-    "Maintenance_Due_No": 0 if maintenance_due_yes else 1,
+input_dict = {
+"Temperature": temperature,
+"Vibration": vibration,
+"Pressure": pressure,
+"Load": load,
+"Age": age,
+"Operational_Mode": op_mode_mapping[op_mode],
 }
 
-input_df = pd.DataFrame([input_data])[feature_columns]
-
-# Prediction
+input_df = pd.DataFrame([input_dict], columns=feature_columns)
+if st.button("Predict Failure Risk 🚦"):
 prediction = model.predict(input_df)[0]
-probability = model.predict_proba(input_df)[0][prediction]
-
-# Result Display with styled boxes
-st.markdown("---")
+pred_prob = model.predict_proba(input_df)[0][1] # Probability of failure class
 if prediction == 1:
-    st.markdown(f'<div class="result-fail">❌ Failure Likely — Confidence: {probability*100:.2f}%</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result-fail">⚠️ High Risk of Failure (Probability: {pred_prob:.2%})</div>', unsafe_allow_html=True)
 else:
-    st.markdown(f'<div class="result-success">✅ No Failure Expected — Confidence: {probability*100:.2f}%</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result-success">✅ Low Risk of Failure (Probability: {1 - pred_prob:.2%})</div>', unsafe_allow_html=True)
 
-# Feature Importance
-st.markdown("---")
-st.markdown('<div class="chart-title">🔍 Feature Importances</div>', unsafe_allow_html=True)
+# Feature importance plot
+st.markdown('<div class="chart-title">Feature Importance</div>', unsafe_allow_html=True)
+importance = model.feature_importances_
+sorted_idx = np.argsort(importance)
+plt.figure(figsize=(8, 4))
+plt.barh(range(len(importance)), importance[sorted_idx], color="#2e86de" if not dark_mode else "#4ab3f4")
+plt.yticks(range(len(importance)), np.array(feature_columns)[sorted_idx])
+plt.xlabel("Importance")
+plt.tight_layout()
+st.pyplot(plt)
+else:
+st.markdown('<div style="text-align:center; font-style:italic; color:#7f8c8d; margin-top:1.5rem;">Click "Predict Failure Risk 🚦" to see the result.</div>', unsafe_allow_html=True)
+st.markdown('<footer>© 2025 Car Component AI Predictor — Built with Streamlit</footer>', unsafe_allow_html=True)
 
-importances = model.feature_importances_
-features = feature_columns
-indices = np.argsort(importances)[::-1]
 
-fig, ax = plt.subplots(figsize=(8, 4))
-color = "#4ab3f4" if dark_mode else "#2e86de"
-ax.bar(range(len(features)), importances[indices], color=color, alpha=0.8)
-ax.set_xticks(range(len(features)))
-ax.set_xticklabels([features[i] for i in indices], rotation=45, ha="right", fontsize=10,
-                   color="#b0bec5" if dark_mode else "#34495e")
-ax.set_title("Top Feature Importances", fontsize=14, color=color, pad=15)
-ax.grid(axis="y", linestyle="--", alpha=0.5)
-st.pyplot(fig)
 
-# Footer
-footer_color = "#78909c" if dark_mode else "#95a5a6"
-st.markdown(
-    f"""
-    <footer style="color:{footer_color};">
-        Developed by Muhammad Areeb Rizwan 🚀
-    </footer>
-    """,
-    unsafe_allow_html=True,
-)
+
