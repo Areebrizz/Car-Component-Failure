@@ -371,6 +371,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 ```python
+
 # Add credits and links to sidebar
 st.sidebar.markdown("""
 ---
@@ -380,4 +381,3 @@ st.sidebar.markdown("""
 - 🌐 [Portfolio](https://sites.google.com/view/m-areeb-rizwan/home)  
 - 💻 [GitHub](https://github.com/Areebrizz)  
 """, unsafe_allow_html=True)
-```
