@@ -20,32 +20,35 @@ col1, col2 = st.columns(2)
 
 with col1:
     temperature = st.slider("Temperature (°C)", 40.0, 160.0, 90.0)
+    st.write(f"Temperature: {temperature:.1f}")
+
     vibration = st.slider("Vibration (units)", 5.0, 100.0, 50.0)
+    st.write(f"Vibration: {vibration:.1f}")
+
     usage = st.slider("Usage (hours)", 50.0, 2200.0, 1000.0)
-   st.markdown("### ⚙️ Component Wear (%)")
-
-component_engine = st.slider("Engine Wear", 0, 100, 5)
-st.write(f"Engine Wear: {component_engine}%")
-
-component_transmission = st.slider("Transmission Wear", 0, 100, 5)
-st.write(f"Transmission Wear: {component_transmission}%")
+    st.write(f"Usage: {usage:.1f}")
 
 with col2:
+    st.markdown("### ⚙️ Component Wear (%)")
 
+    component_engine = st.slider("Engine Wear", 0, 100, 5)
+    st.write(f"Engine Wear: {component_engine}%")
 
-component_brakepad = st.slider("Brake Pad Wear", 0, 100, 5)
-st.write(f"Brake Pad Wear: {component_brakepad}%")
+    component_transmission = st.slider("Transmission Wear", 0, 100, 5)
+    st.write(f"Transmission Wear: {component_transmission}%")
 
-component_suspension = st.slider("Suspension Wear", 0, 100, 5)
-st.write(f"Suspension Wear: {component_suspension}%")
+    component_brakepad = st.slider("Brake Pad Wear", 0, 100, 5)
+    st.write(f"Brake Pad Wear: {component_brakepad}%")
 
-component_exhaust = st.slider("Exhaust Wear", 0, 100, 5)
-st.write(f"Exhaust Wear: {component_exhaust}%")
+    component_suspension = st.slider("Suspension Wear", 0, 100, 5)
+    st.write(f"Suspension Wear: {component_suspension}%")
+
+    component_exhaust = st.slider("Exhaust Wear", 0, 100, 5)
+    st.write(f"Exhaust Wear: {component_exhaust}%")
+
     maintenance_due_yes = st.radio("Maintenance Due?", ["Yes", "No"]) == "Yes"
 
-maintenance_due_no = not maintenance_due_yes
-
-# Prepare input for prediction
+# Prepare input for prediction (convert wear % to 0-1 scale)
 input_data = {
     "Temperature": temperature,
     "Vibration": vibration,
@@ -56,7 +59,7 @@ input_data = {
     "Component_Suspension": component_suspension / 100,
     "Component_Exhaust": component_exhaust / 100,
     "Maintenance_Due_Yes": 1 if maintenance_due_yes else 0,
-    "Maintenance_Due_No": 1 if maintenance_due_no else 0,
+    "Maintenance_Due_No": 0 if maintenance_due_yes else 1,
 }
 
 input_df = pd.DataFrame([input_data])[feature_columns]
