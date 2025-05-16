@@ -1,40 +1,37 @@
 import streamlit as st
-import pandas as pd
 import joblib
+import numpy as np
 
-# Load the trained model
+# Load model once
 model = joblib.load("car_component_failure_model_balanced.pkl")
 
-st.title("Car Component Failure Prediction")
+st.title("🚗 Car Component Failure Prediction")
+st.markdown("""
+Predict the likelihood of failure based on input sensor values.
+""")
 
-st.write("Input the feature values to predict failure:")
+with st.form("input_form"):
+    st.subheader("Input Feature Values")
 
-# Define the features exactly as your model expects (modify as per your dataset)
-# Example assuming features: 'Feature1', 'Feature2', 'Feature3', etc.
-# Replace these with your actual feature column names
+    col1, col2 = st.columns(2)
+    with col1:
+        engine_temp = st.slider("Engine Temperature (°C)", min_value=0.0, max_value=150.0, step=0.1, value=70.0, help="Temperature of the engine")
+        brake_pressure = st.slider("Brake Pressure (psi)", min_value=0.0, max_value=200.0, step=0.1, value=50.0)
+    with col2:
+        oil_level_low = st.selectbox("Oil Level Low", options=[0, 1], format_func=lambda x: "No" if x == 0 else "Yes", help="Is the oil level low?")
+        tire_condition_good = st.selectbox("Tire Condition Good", options=[0, 1], format_func=lambda x: "No" if x == 0 else "Yes", help="Are the tires in good condition?")
 
-feature_names = [
-    # List your encoded feature names here exactly as in training
-    # If you used one-hot encoding, include the columns accordingly
-    # Example:
-    'Engine_Temperature', 'Brake_Pressure', 'Oil_Level_Low', 'Tire_Condition_Good', # etc.
-]
+    submitted = st.form_submit_button("Predict Failure")
 
-# For simplicity, let’s generate input fields dynamically
-input_data = {}
-for feature in feature_names:
-    # If your features are numeric
-    input_data[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
-
-# Convert input data to DataFrame
-input_df = pd.DataFrame([input_data])
-
-# Prediction button
-if st.button("Predict Failure"):
-    prediction = model.predict(input_df)[0]
-    proba = model.predict_proba(input_df)[0][1]
+if submitted:
+    # Prepare feature vector as DataFrame or numpy array matching training data order
+    features = np.array([[engine_temp, brake_pressure, oil_level_low, tire_condition_good]])
+    
+    # Predict
+    prediction = model.predict(features)[0]
+    proba = model.predict_proba(features)[0][prediction]
 
     if prediction == 1:
-        st.error(f"🚨 Component likely to FAIL! Probability: {proba:.2f}")
+        st.error(f"⚠️ Predicted Failure! Confidence: {proba:.2%}")
     else:
-        st.success(f"✅ Component likely to be OK. Probability of failure: {proba:.2f}")
+        st.success(f"✅ No Failure predicted. Confidence: {proba:.2%}")
