@@ -148,7 +148,7 @@ feature_columns = joblib.load("feature_columns.pkl")
 st.sidebar.markdown("""
 ---
 ### Credits & Links
-- 👨‍💻 Made By:- [Muhammad Areeb Rizwan](https://www.linkedin.com/in/areebrizwan)  
+- 👨‍💻 Made By:- [M Areeb Rizwan](https://www.linkedin.com/in/areebrizwan)  
 - 🌐 [Portfolio](https://sites.google.com/view/m-areeb-rizwan/home)  
 - 💻 [GitHub](https://github.com/Areebrizz)  
 """, unsafe_allow_html=True)
