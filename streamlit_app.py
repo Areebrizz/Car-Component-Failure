@@ -3,7 +3,7 @@ import joblib
 import numpy as np
 
 # Load model once
-model = joblib.load("car_component_failure_model_balanced.pkl")
+model = joblib.load("car_component_failure_balanced.pkl11111")
 
 st.title("🚗 Car Component Failure Prediction")
 st.markdown("""
