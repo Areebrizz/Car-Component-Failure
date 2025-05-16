@@ -8,20 +8,19 @@ import matplotlib.pyplot as plt
 model = joblib.load("car_component_failure_balanced.pkl11111")
 feature_columns = joblib.load("feature_columns.pkl")
 
-# Page config
 st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="centered")
 
-# --- Custom CSS styles ---
-st.markdown(
-    """
-    <style>
-    /* Background and fonts */
+# Dark mode toggle
+dark_mode = st.sidebar.checkbox("🌙 Dark Mode", value=False)
+
+# CSS for light and dark modes
+light_css = """
+<style>
     .main {
         background-color: #f9fbfc;
         color: #2c3e50;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    /* Header style */
     .header {
         font-size: 3rem;
         font-weight: 700;
@@ -30,7 +29,6 @@ st.markdown(
         margin-bottom: 0.1em;
         font-family: 'Segoe UI Black', sans-serif;
     }
-    /* Subheader */
     .subheader {
         font-size: 1.3rem;
         text-align: center;
@@ -38,7 +36,6 @@ st.markdown(
         margin-bottom: 2rem;
         font-weight: 500;
     }
-    /* Input container */
     .input-container {
         background: white;
         border-radius: 15px;
@@ -46,7 +43,6 @@ st.markdown(
         box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
         margin-bottom: 2rem;
     }
-    /* Sliders labels and values */
     .slider-label {
         font-weight: 600;
         color: #34495e;
@@ -60,14 +56,12 @@ st.markdown(
         margin-bottom: 10px;
         font-family: monospace;
     }
-    /* Radio buttons */
     .radio-label {
         font-size: 1.1rem;
         font-weight: 600;
         color: #34495e;
         margin-bottom: 0.5rem;
     }
-    /* Prediction result boxes */
     .result-success {
         background-color: #d4efdf;
         color: #27ae60;
@@ -88,7 +82,6 @@ st.markdown(
         text-align: center;
         box-shadow: 0 4px 15px rgb(192 57 43 / 0.4);
     }
-    /* Feature importance chart */
     .chart-title {
         font-weight: 700;
         font-size: 1.3rem;
@@ -96,7 +89,6 @@ st.markdown(
         margin-bottom: 0.5rem;
         text-align: center;
     }
-    /* Footer */
     footer {
         text-align: center;
         font-size: 0.9rem;
@@ -106,10 +98,98 @@ st.markdown(
         border-top: 1px solid #ecf0f1;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+</style>
+"""
+
+dark_css = """
+<style>
+    .main {
+        background-color: #121212;
+        color: #e0e0e0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .header {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #4ab3f4;
+        text-align: center;
+        margin-bottom: 0.1em;
+        font-family: 'Segoe UI Black', sans-serif;
+    }
+    .subheader {
+        font-size: 1.3rem;
+        text-align: center;
+        color: #b0bec5;
+        margin-bottom: 2rem;
+        font-weight: 500;
+    }
+    .input-container {
+        background: #1e1e1e;
+        border-radius: 15px;
+        padding: 20px 25px;
+        box-shadow: 0 8px 20px rgb(0 0 0 / 0.9);
+        margin-bottom: 2rem;
+    }
+    .slider-label {
+        font-weight: 600;
+        color: #b0bec5;
+        margin-bottom: 0.3rem;
+        font-size: 1.1rem;
+    }
+    .slider-value {
+        color: #90a4ae;
+        font-size: 0.9rem;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        font-family: monospace;
+    }
+    .radio-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #b0bec5;
+        margin-bottom: 0.5rem;
+    }
+    .result-success {
+        background-color: #2e7d32;
+        color: #a5d6a7;
+        border-radius: 12px;
+        padding: 20px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgb(165 214 167 / 0.7);
+    }
+    .result-fail {
+        background-color: #c62828;
+        color: #ef9a9a;
+        border-radius: 12px;
+        padding: 20px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgb(239 154 154 / 0.7);
+    }
+    .chart-title {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #4ab3f4;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #78909c;
+        margin-top: 3rem;
+        padding-top: 10px;
+        border-top: 1px solid #263238;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+</style>
+"""
+
+# Inject CSS based on toggle
+st.markdown(dark_css if dark_mode else light_css, unsafe_allow_html=True)
 
 # --- Title and subtitle ---
 st.markdown('<div class="header">🚗 Car Component Failure Predictor</div>', unsafe_allow_html=True)
@@ -198,17 +278,20 @@ features = feature_columns
 indices = np.argsort(importances)[::-1]
 
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(range(len(features)), importances[indices], color="#2e86de", alpha=0.8)
+color = "#4ab3f4" if dark_mode else "#2e86de"
+ax.bar(range(len(features)), importances[indices], color=color, alpha=0.8)
 ax.set_xticks(range(len(features)))
-ax.set_xticklabels([features[i] for i in indices], rotation=45, ha="right", fontsize=10, color="#34495e")
-ax.set_title("Top Feature Importances", fontsize=14, color="#2e86de", pad=15)
+ax.set_xticklabels([features[i] for i in indices], rotation=45, ha="right", fontsize=10,
+                   color="#b0bec5" if dark_mode else "#34495e")
+ax.set_title("Top Feature Importances", fontsize=14, color=color, pad=15)
 ax.grid(axis="y", linestyle="--", alpha=0.5)
 st.pyplot(fig)
 
 # Footer
+footer_color = "#78909c" if dark_mode else "#95a5a6"
 st.markdown(
-    """
-    <footer>
+    f"""
+    <footer style="color:{footer_color};">
         Developed by Muhammad Areeb Rizwan 🚀
     </footer>
     """,
