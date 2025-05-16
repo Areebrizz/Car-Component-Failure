@@ -14,7 +14,8 @@ st.set_page_config(page_title="Car Component Failure Prediction", page_icon="ðŸš
 dark_mode = st.sidebar.checkbox("ðŸŒ™ Dark Mode", value=False)
 
 # Inject CSS based on dark mode toggle
-st.markdown(open("light.css" if not dark_mode else "dark.css", "r").read(), unsafe_allow_html=True)
+st.markdown(dark_css if dark_mode else light_css, unsafe_allow_html=True)
+
 
 # --- Sidebar credits ---
 st.sidebar.markdown("""
