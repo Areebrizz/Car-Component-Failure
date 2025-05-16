@@ -4,18 +4,71 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
-# Load model and features
-model = joblib.load("car_component_failure_balanced.pkl11111")
-feature_columns = joblib.load("feature_columns.pkl")
-
+# Set page configuration
 st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="wide")
 
 # Dark mode toggle
 dark_mode = st.sidebar.checkbox("🌙 Dark Mode", value=False)
 
-# Inject CSS based on dark mode toggle
+# Define light and dark CSS themes
+light_css = """
+<style>
+body, .main {
+    background-color: #f9fbfc;
+    color: #2c3e50;
+}
+.header {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #2e86de;
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+}
+.subheader {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #34495e;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+</style>
+"""
+
+dark_css = """
+<style>
+body, .main {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+.header {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #4ab3f4;
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+}
+.subheader {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #b0bec5;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+</style>
+"""
+
+# Apply the selected CSS theme
 st.markdown(dark_css if dark_mode else light_css, unsafe_allow_html=True)
 
+# Load model and features
+model = joblib.load("car_component_failure_balanced.pkl11111")
+feature_columns = joblib.load("feature_columns.pkl")
 
 # --- Sidebar credits ---
 st.sidebar.markdown("""
@@ -31,8 +84,8 @@ st.sidebar.markdown("""
 st.markdown('<div class="header">🚗 Car Component Failure Predictor</div>', unsafe_allow_html=True)
 st.markdown('<div class="subheader">Enter component readings to assess risk of failure.</div>', unsafe_allow_html=True)
 
-# --- Inputs layout ---
-st.markdown('<div class="inputs-wrapper">', unsafe_allow_html=True)
+# Continue with rest of your app...
+
 
 with st.container():
     st.markdown('<div class="input-column">', unsafe_allow_html=True)
