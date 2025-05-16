@@ -1,38 +1,53 @@
 import streamlit as st
 import joblib
-import numpy as np
+import pandas as pd
 
-# Load model once
-model = joblib.load("car_component_failure_balanced.pkl11111")
-feature_columns = joblib.load('feature_columns.pkl')
+st.set_page_config(page_title="Car Component Failure Prediction", layout="centered")
 
+# --- Load model and expected feature columns ---
+model = joblib.load("car_component_failure_balanced.pkl")
+feature_columns = joblib.load("feature_columns.pkl")
+
+# --- App UI ---
 st.title("🚗 Car Component Failure Prediction")
-st.markdown("""
-Predict the likelihood of failure based on input sensor values.
-""")
+st.markdown("Predict potential failure based on sensor inputs and vehicle conditions.")
 
-with st.form("input_form"):
-    st.subheader("Input Feature Values")
+st.subheader("🔧 Input Vehicle Data")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        engine_temp = st.slider("Engine Temperature (°C)", min_value=0.0, max_value=150.0, step=0.1, value=70.0, help="Temperature of the engine")
-        brake_pressure = st.slider("Brake Pressure (psi)", min_value=0.0, max_value=200.0, step=0.1, value=50.0)
-    with col2:
-        oil_level_low = st.selectbox("Oil Level Low", options=[0, 1], format_func=lambda x: "No" if x == 0 else "Yes", help="Is the oil level low?")
-        tire_condition_good = st.selectbox("Tire Condition Good", options=[0, 1], format_func=lambda x: "No" if x == 0 else "Yes", help="Are the tires in good condition?")
+# Get user input
+engine_temp = st.slider("Engine Temperature (°C)", 40, 120, 75)
+brake_pressure = st.slider("Brake Pressure (bar)", 0, 100, 50)
+oil_level_low = st.selectbox("Is Oil Level Low?", ["No", "Yes"])
+tire_condition = st.selectbox("Tire Condition", ["Bad", "Good"])
 
-    submitted = st.form_submit_button("Predict Failure")
+# Convert categorical selections
+oil_level_low_val = 1 if oil_level_low == "Yes" else 0
+tire_condition_val = 1 if tire_condition == "Good" else 0
 
-if submitted:
-    # Prepare feature vector as DataFrame or numpy array matching training data order
-    features = np.array([[engine_temp, brake_pressure, oil_level_low, tire_condition_good]])
-    
-    # Predict
-    prediction = model.predict(features)[0]
-    proba = model.predict_proba(features)[0][prediction]
+# --- Prepare input for model ---
+input_dict = dict.fromkeys(feature_columns, 0)  # initialize all features to 0
+
+# Set numeric values
+input_dict['Engine_Temperature'] = engine_temp
+input_dict['Brake_Pressure'] = brake_pressure
+
+# Set one-hot encoded values
+input_dict[f'Oil_Level_Low_{oil_level_low_val}'] = 1
+input_dict[f'Tire_Condition_Good_{tire_condition_val}'] = 1
+
+# Convert to DataFrame
+input_df = pd.DataFrame([input_dict])
+
+# --- Prediction ---
+if st.button("🔍 Predict Failure"):
+    prediction = model.predict(input_df)[0]
+    proba = model.predict_proba(input_df)[0][prediction]
 
     if prediction == 1:
-        st.error(f"⚠️ Predicted Failure! Confidence: {proba:.2%}")
+        st.error(f"⚠️ Component is likely to FAIL! (Confidence: {proba:.2f})")
     else:
-        st.success(f"✅ No Failure predicted. Confidence: {proba:.2%}")
+        st.success(f"✅ Component is likely to be OK. (Confidence: {proba:.2f})")
+
+# Optional: Expandable section to view input
+with st.expander("🔎 View Input Data Used"):
+    st.dataframe(input_df)
