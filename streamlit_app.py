@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="Car Component Failure Prediction", layout="centered")
 
 # --- Load model and expected feature columns ---
-model = joblib.load("car_component_failure_balanced.pkl")
+model = joblib.load("car_component_failure_balanced.pkl11111")
 feature_columns = joblib.load("feature_columns.pkl")
 
 # --- App UI ---
