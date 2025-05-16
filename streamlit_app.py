@@ -4,6 +4,7 @@ import numpy as np
 
 # Load model once
 model = joblib.load("car_component_failure_balanced.pkl11111")
+feature_columns = joblib.load('feature_columns.pkl')
 
 st.title("🚗 Car Component Failure Prediction")
 st.markdown("""
