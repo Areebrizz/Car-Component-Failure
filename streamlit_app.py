@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load the trained model
-model = joblib.load("car_component_failure_balanced.pkl")
+model = joblib.load("car_component_failure_model_balanced.pkl")
 
 st.title("Car Component Failure Prediction")
 
