@@ -22,14 +22,25 @@ with col1:
     temperature = st.slider("Temperature (°C)", 40.0, 160.0, 90.0)
     vibration = st.slider("Vibration (units)", 5.0, 100.0, 50.0)
     usage = st.slider("Usage (hours)", 50.0, 2200.0, 1000.0)
-    st.markdown("### ⚙️ Component Wear (%)")
-    component_engine = st.slider("Engine Wear (%)", 0, 100, 5)
-    component_transmission = st.slider("Transmission Wear (%)", 0, 100, 5)
+   st.markdown("### ⚙️ Component Wear (%)")
+
+component_engine = st.slider("Engine Wear", 0, 100, 5)
+st.write(f"Engine Wear: {component_engine}%")
+
+component_transmission = st.slider("Transmission Wear", 0, 100, 5)
+st.write(f"Transmission Wear: {component_transmission}%")
 
 with col2:
-    component_brakepad = st.slider("Brake Pad Wear (%)", 0, 100, 5)
-    component_suspension = st.slider("Suspension Wear (%)", 0, 100, 5)
-    component_exhaust = st.slider("Exhaust Wear (%)", 0, 100, 5)
+
+
+component_brakepad = st.slider("Brake Pad Wear", 0, 100, 5)
+st.write(f"Brake Pad Wear: {component_brakepad}%")
+
+component_suspension = st.slider("Suspension Wear", 0, 100, 5)
+st.write(f"Suspension Wear: {component_suspension}%")
+
+component_exhaust = st.slider("Exhaust Wear", 0, 100, 5)
+st.write(f"Exhaust Wear: {component_exhaust}%")
     maintenance_due_yes = st.radio("Maintenance Due?", ["Yes", "No"]) == "Yes"
 
 maintenance_due_no = not maintenance_due_yes
