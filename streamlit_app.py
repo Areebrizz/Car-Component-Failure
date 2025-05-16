@@ -11,44 +11,158 @@ feature_columns = joblib.load("feature_columns.pkl")
 # Page config
 st.set_page_config(page_title="Car Component Failure Prediction", page_icon="🚗", layout="centered")
 
-# Title
-st.markdown("<h1 style='text-align: center; color: #4A90E2;'>🚗 Car Component Failure Predictor</h1>", unsafe_allow_html=True)
-st.markdown("### Enter component readings to assess risk of failure.")
+# --- Custom CSS styles ---
+st.markdown(
+    """
+    <style>
+    /* Background and fonts */
+    .main {
+        background-color: #f9fbfc;
+        color: #2c3e50;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    /* Header style */
+    .header {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #2e86de;
+        text-align: center;
+        margin-bottom: 0.1em;
+        font-family: 'Segoe UI Black', sans-serif;
+    }
+    /* Subheader */
+    .subheader {
+        font-size: 1.3rem;
+        text-align: center;
+        color: #34495e;
+        margin-bottom: 2rem;
+        font-weight: 500;
+    }
+    /* Input container */
+    .input-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px 25px;
+        box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
+        margin-bottom: 2rem;
+    }
+    /* Sliders labels and values */
+    .slider-label {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.3rem;
+        font-size: 1.1rem;
+    }
+    .slider-value {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        font-family: monospace;
+    }
+    /* Radio buttons */
+    .radio-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.5rem;
+    }
+    /* Prediction result boxes */
+    .result-success {
+        background-color: #d4efdf;
+        color: #27ae60;
+        border-radius: 12px;
+        padding: 20px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgb(39 174 96 / 0.4);
+    }
+    .result-fail {
+        background-color: #f9d6d5;
+        color: #c0392b;
+        border-radius: 12px;
+        padding: 20px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgb(192 57 43 / 0.4);
+    }
+    /* Feature importance chart */
+    .chart-title {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #2e86de;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    /* Footer */
+    footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #95a5a6;
+        margin-top: 3rem;
+        padding-top: 10px;
+        border-top: 1px solid #ecf0f1;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# UI Layout with columns
-col1, col2 = st.columns(2)
+# --- Title and subtitle ---
+st.markdown('<div class="header">🚗 Car Component Failure Predictor</div>', unsafe_allow_html=True)
+st.markdown('<div class="subheader">Enter component readings to assess risk of failure.</div>', unsafe_allow_html=True)
 
-with col1:
-    temperature = st.slider("Temperature (°C)", 40.0, 160.0, 90.0)
-    st.write(f"Temperature: {temperature:.1f}")
+# --- Input sliders container ---
+with st.container():
+    st.markdown('<div class="input-container">', unsafe_allow_html=True)
 
-    vibration = st.slider("Vibration (units)", 5.0, 100.0, 50.0)
-    st.write(f"Vibration: {vibration:.1f}")
+    col1, col2 = st.columns(2)
 
-    usage = st.slider("Usage (hours)", 50.0, 2200.0, 1000.0)
-    st.write(f"Usage: {usage:.1f}")
+    with col1:
+        st.markdown('<div class="slider-label">Temperature (°C)</div>', unsafe_allow_html=True)
+        temperature = st.slider("", 40.0, 160.0, 90.0, key="temp")
+        st.markdown(f'<div class="slider-value">{temperature:.1f}</div>', unsafe_allow_html=True)
 
-with col2:
-    st.markdown("### ⚙️ Component Wear (%)")
+        st.markdown('<div class="slider-label">Vibration (units)</div>', unsafe_allow_html=True)
+        vibration = st.slider("", 5.0, 100.0, 50.0, key="vib")
+        st.markdown(f'<div class="slider-value">{vibration:.1f}</div>', unsafe_allow_html=True)
 
-    component_engine = st.slider("Engine Wear", 0, 100, 5)
-    st.write(f"Engine Wear: {component_engine}%")
+        st.markdown('<div class="slider-label">Usage (hours)</div>', unsafe_allow_html=True)
+        usage = st.slider("", 50.0, 2200.0, 1000.0, key="usage")
+        st.markdown(f'<div class="slider-value">{usage:.1f}</div>', unsafe_allow_html=True)
 
-    component_transmission = st.slider("Transmission Wear", 0, 100, 5)
-    st.write(f"Transmission Wear: {component_transmission}%")
+    with col2:
+        st.markdown('<div class="slider-label">⚙️ Component Wear (%)</div>', unsafe_allow_html=True)
 
-    component_brakepad = st.slider("Brake Pad Wear", 0, 100, 5)
-    st.write(f"Brake Pad Wear: {component_brakepad}%")
+        st.markdown('<div class="slider-label">Engine Wear</div>', unsafe_allow_html=True)
+        component_engine = st.slider("", 0, 100, 5, key="engine_wear")
+        st.markdown(f'<div class="slider-value">{component_engine}%</div>', unsafe_allow_html=True)
 
-    component_suspension = st.slider("Suspension Wear", 0, 100, 5)
-    st.write(f"Suspension Wear: {component_suspension}%")
+        st.markdown('<div class="slider-label">Transmission Wear</div>', unsafe_allow_html=True)
+        component_transmission = st.slider("", 0, 100, 5, key="trans_wear")
+        st.markdown(f'<div class="slider-value">{component_transmission}%</div>', unsafe_allow_html=True)
 
-    component_exhaust = st.slider("Exhaust Wear", 0, 100, 5)
-    st.write(f"Exhaust Wear: {component_exhaust}%")
+        st.markdown('<div class="slider-label">Brake Pad Wear</div>', unsafe_allow_html=True)
+        component_brakepad = st.slider("", 0, 100, 5, key="brake_wear")
+        st.markdown(f'<div class="slider-value">{component_brakepad}%</div>', unsafe_allow_html=True)
 
-    maintenance_due_yes = st.radio("Maintenance Due?", ["Yes", "No"]) == "Yes"
+        st.markdown('<div class="slider-label">Suspension Wear</div>', unsafe_allow_html=True)
+        component_suspension = st.slider("", 0, 100, 5, key="susp_wear")
+        st.markdown(f'<div class="slider-value">{component_suspension}%</div>', unsafe_allow_html=True)
 
-# Prepare input for prediction (convert wear % to 0-1 scale)
+        st.markdown('<div class="slider-label">Exhaust Wear</div>', unsafe_allow_html=True)
+        component_exhaust = st.slider("", 0, 100, 5, key="exhaust_wear")
+        st.markdown(f'<div class="slider-value">{component_exhaust}%</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="radio-label">Maintenance Due?</div>', unsafe_allow_html=True)
+        maintenance_due_yes = st.radio("", ["Yes", "No"], key="maint_due") == "Yes"
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Prepare input for prediction (convert % to 0-1)
 input_data = {
     "Temperature": temperature,
     "Vibration": vibration,
@@ -68,30 +182,35 @@ input_df = pd.DataFrame([input_data])[feature_columns]
 prediction = model.predict(input_df)[0]
 probability = model.predict_proba(input_df)[0][prediction]
 
-# Result Display
+# Result Display with styled boxes
 st.markdown("---")
-st.markdown("## 🧠 Prediction Result")
-
 if prediction == 1:
-    st.error(f"❌ Failure Likely — Confidence: {probability*100:.2f}%")
+    st.markdown(f'<div class="result-fail">❌ Failure Likely — Confidence: {probability*100:.2f}%</div>', unsafe_allow_html=True)
 else:
-    st.success(f"✅ No Failure Expected — Confidence: {probability*100:.2f}%")
+    st.markdown(f'<div class="result-success">✅ No Failure Expected — Confidence: {probability*100:.2f}%</div>', unsafe_allow_html=True)
 
 # Feature Importance
 st.markdown("---")
-st.markdown("### 🔍 Feature Importances")
+st.markdown('<div class="chart-title">🔍 Feature Importances</div>', unsafe_allow_html=True)
 
 importances = model.feature_importances_
 features = feature_columns
 indices = np.argsort(importances)[::-1]
 
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(range(len(features)), importances[indices], color="#4A90E2")
+ax.bar(range(len(features)), importances[indices], color="#2e86de", alpha=0.8)
 ax.set_xticks(range(len(features)))
-ax.set_xticklabels([features[i] for i in indices], rotation=45, ha="right")
-ax.set_title("Top Feature Importances")
+ax.set_xticklabels([features[i] for i in indices], rotation=45, ha="right", fontsize=10, color="#34495e")
+ax.set_title("Top Feature Importances", fontsize=14, color="#2e86de", pad=15)
+ax.grid(axis="y", linestyle="--", alpha=0.5)
 st.pyplot(fig)
 
 # Footer
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Developed by Muhammad Areeb Rizwan 🚀</p>", unsafe_allow_html=True)
+st.markdown(
+    """
+    <footer>
+        Developed by Muhammad Areeb Rizwan 🚀
+    </footer>
+    """,
+    unsafe_allow_html=True,
+)
