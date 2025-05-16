@@ -1,0 +1,51 @@
+from google.colab import files
+uploaded = files.upload()
+# Install required packages
+!pip install -q pandas scikit-learn openpyxl imbalanced-learn
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from imblearn.over_sampling import SMOTE
+import joblib
+
+# Step 1: Load Data
+df = pd.read_excel("car_component_failure_balanced.xlsx", engine="openpyxl")
+
+# Step 2: Encode Categorical Features
+X = pd.get_dummies(df.drop('Failure', axis=1))
+y = df['Failure']
+
+# Step 3: Stratified Train-Test Split (preserves 70:30 ratio)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+# Step 4: Apply SMOTE only on training data
+sm = SMOTE(random_state=42)
+X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
+
+# Step 5: Train Random Forest
+rf = RandomForestClassifier(n_estimators=300, max_depth=15, class_weight='balanced', random_state=42)
+rf.fit(X_train_res, y_train_res)
+
+# Step 6: Evaluate
+y_pred = rf.predict(X_test)
+
+print("✅ Accuracy:", accuracy_score(y_test, y_pred))
+print("\n📊 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\n📄 Classification Report:\n", classification_report(y_test, y_pred))
+import matplotlib.pyplot as plt
+
+importances = rf.feature_importances_
+features = X.columns
+indices = importances.argsort()[::-1]
+
+plt.figure(figsize=(10, 5))
+plt.title("Top Feature Importances")
+plt.bar(range(len(features)), importances[indices])
+plt.xticks(range(len(features)), [features[i] for i in indices], rotation=90)
+plt.tight_layout()
+plt.show()
+
+# Step 7: Save model
+joblib.dump(rf, "car_component_failure_balanced.pkl")
