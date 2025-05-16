@@ -370,3 +370,14 @@ st.markdown("""
 </footer>
 """, unsafe_allow_html=True)
 
+```python
+# Add credits and links to sidebar
+st.sidebar.markdown("""
+---
+### Credits & Links
+
+- 👨‍💻 Made by [Muhammad Areeb Rizwan](https://www.linkedin.com/in/areebrizwan)  
+- 🌐 [Portfolio](https://sites.google.com/view/m-areeb-rizwan/home)  
+- 💻 [GitHub](https://github.com/Areebrizz)  
+""", unsafe_allow_html=True)
+```
